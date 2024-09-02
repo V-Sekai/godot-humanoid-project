@@ -108,7 +108,6 @@ func _process(_delta: float) -> void:
 					
 func _get_property_list() -> Array[Dictionary]:
 	var properties: Array[Dictionary] = []
-	
 	for i: int in range(0, human_trait_const.MuscleCount):
 		properties.append({
 			"name": "muscle_settings/" + human_trait_const.MuscleName[i],
@@ -116,9 +115,6 @@ func _get_property_list() -> Array[Dictionary]:
 			"hint": PROPERTY_HINT_RANGE,
 			"hint_string": "-1.0, 1.0",
 		})
-	
-	print(properties)
-	
 	return properties
 	
 func _get(property: StringName) -> Variant:
