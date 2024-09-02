@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgxo0dbj8x7ev"]
+
+[ext_resource type="PackedScene" uid="uid://blfjqkpu1lsqr" path="res://humanoid/art/mire/mire.vrm" id="1_m1v5l"]
+
+[node name="mire" instance=ExtResource("1_m1v5l")]
+
+[node name="Head" parent="GeneralSkeleton" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000147431, 1.48675, -0.0150427)

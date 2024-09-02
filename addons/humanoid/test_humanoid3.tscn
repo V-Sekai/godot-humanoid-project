@@ -1,8 +1,8 @@
 [gd_scene load_steps=10 format=3 uid="uid://cyeqkpfq5ggnx"]
 
 [ext_resource type="Script" path="res://addons/humanoid/humanoid_pose_calculator.gd" id="1_wkorn"]
-[ext_resource type="PackedScene" uid="uid://ksafs40kyhfi" path="res://galatea/import/avatars/sar1_bot/sar1_bot.gltf" id="2_a4l1b"]
-[ext_resource type="AnimationLibrary" uid="uid://p5vjv0x8loar" path="res://galatea/animation_libraries/actor_animation_locomotion.tres" id="3_srdl8"]
+[ext_resource type="PackedScene" uid="uid://bgxo0dbj8x7ev" path="res://humanoid/scenes/mire.tscn" id="2_a4l1b"]
+[ext_resource type="AnimationLibrary" path="res://galatea/animation_libraries/actor_animation_locomotion.tres" id="3_srdl8"]
 [ext_resource type="Script" path="res://addons/humanoid/humanoid_driver.gd" id="4_ejdwd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rsahn"]
