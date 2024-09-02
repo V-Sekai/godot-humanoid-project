@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://deho4t8uvcf06"]
 
-[ext_resource type="PackedScene" uid="uid://bgxo0dbj8x7ev" path="res://humanoid/scenes/mire.tscn" id="1_73tle"]
-[ext_resource type="Animation" uid="uid://ub7eyxmnlg7s" path="res://humanoid/art/animation/pronama_chan/SK_pronama_02_melt.tres" id="2_gsbym"]
-[ext_resource type="Script" path="res://addons/humanoid/humanoid_driver.gd" id="2_svre7"]
-[ext_resource type="Script" path="res://addons/humanoid/humanoid_pose_calculator.gd" id="3_c4ngu"]
+[ext_resource type="Script" path="res://addons/humanoid/humanoid_pose_calculator.gd" id="1_k514x"]
+[ext_resource type="PackedScene" uid="uid://bgxo0dbj8x7ev" path="res://humanoid/scenes/mire.tscn" id="2_d3vne"]
+[ext_resource type="Animation" uid="uid://ub7eyxmnlg7s" path="res://humanoid/art/animation/pronama_chan/SK_pronama_02_melt.tres" id="3_lc53o"]
+[ext_resource type="Script" path="res://addons/humanoid/humanoid_driver.gd" id="4_ce65v"]
 
 [sub_resource type="Animation" id="Animation_g50bi"]
 resource_name = "RESET"
@@ -254,14 +254,14 @@ tracks/16/keys = PackedFloat32Array(0, 1, 1, 1.00002, 1.00001)
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_q0uiy"]
 _data = {
 "RESET": SubResource("Animation_g50bi"),
-"SK_pronama_02_melt": ExtResource("2_gsbym"),
+"SK_pronama_02_melt": ExtResource("3_lc53o"),
 "TestPose": SubResource("Animation_o73s2")
 }
 
 [node name="Node3D" type="Node3D"]
 
 [node name="HumanoidPoseCalculator" type="Node" parent="." node_paths=PackedStringArray("skeleton", "target")]
-script = ExtResource("3_c4ngu")
+script = ExtResource("1_k514x")
 active = true
 skeleton = NodePath("../Source/GeneralSkeleton")
 target = NodePath("../HumanoidDriver")
@@ -271,7 +271,7 @@ transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0.316836, 1.23421, 0.0076316
 bone_name = "LeftLowerArm"
 bone_idx = 9
 
-[node name="Source" parent="." instance=ExtResource("1_73tle")]
+[node name="Source" parent="." instance=ExtResource("2_d3vne")]
 
 [node name="GeneralSkeleton" parent="Source" index="0"]
 bones/0/position = Vector3(0.00602529, 1.05254, 0.00866966)
@@ -340,7 +340,7 @@ libraries = {
 "": SubResource("AnimationLibrary_q0uiy")
 }
 
-[node name="Target" parent="." instance=ExtResource("1_73tle")]
+[node name="Target" parent="." instance=ExtResource("2_d3vne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 
 [node name="GeneralSkeleton" parent="Target" index="0"]
@@ -401,7 +401,7 @@ bones/87/rotation = Quaternion(0.060395, 0.679544, -0.728646, -0.060395)
 transform = Transform3D(0.985377, -0.133397, 0.10601, 0.13533, 0.990737, -0.0112256, -0.103531, 0.0254079, 0.994302, 0.0249044, 1.56697, -0.0356987)
 
 [node name="HumanoidDriver" type="Node" parent="." node_paths=PackedStringArray("skeleton")]
-script = ExtResource("2_svre7")
+script = ExtResource("4_ce65v")
 reset_pose = true
 active = true
 skeleton = NodePath("../Target/GeneralSkeleton")
