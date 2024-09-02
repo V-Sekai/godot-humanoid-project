@@ -1,1 +1,1 @@
-# -godot-humanoid-project
+# godot-humanoid-project
