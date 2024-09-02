@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://cpcdm6qgj0fpq"]
 
 [ext_resource type="PackedScene" uid="uid://bgxo0dbj8x7ev" path="res://humanoid/scenes/mire.tscn" id="1_73tle"]
-[ext_resource type="AnimationLibrary" path="res://galatea/animation_libraries/actor_animation_locomotion.tres" id="2_gsbym"]
+[ext_resource type="AnimationLibrary" uid="uid://ub7eyxmnlg7s" path="res://humanoid/art/animation/pronama_chan/SK_pronama_02_melt.tres" id="2_gsbym"]
 [ext_resource type="Script" path="res://addons/humanoid/humanoid_driver.gd" id="2_svre7"]
 [ext_resource type="Script" path="res://addons/humanoid/humanoid_pose_calculator.gd" id="3_c4ngu"]
 
