@@ -196,8 +196,12 @@ static func inverse_calculate_humanoid_rotation(leftovers: Array[Quaternion], bo
 	elif bone_idx > human_trait.HumanBodyBones.Chest:
 		mono_bone_idx += 1
 	var parent_bone_idx: int = human_trait.boneIndexToMono[human_trait.boneIndexToParent[mono_bone_idx]]
-	
-	rotation = leftovers[parent_bone_idx] * rotation
+		
+	var leftover_rotation = Quaternion()
+	if parent_bone_idx >= 0 and parent_bone_idx < leftovers.size():
+		leftover_rotation = leftovers[parent_bone_idx]
+
+	rotation = leftover_rotation * rotation
 
 	var preQ : Quaternion = human_trait.preQ_exported[bone_idx]
 	if from_postq:
