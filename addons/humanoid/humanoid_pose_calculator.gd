@@ -1,19 +1,6 @@
-# -!- coding: utf-8 -!-
-#
 # Copyright 2023-present Lyuma and contributors
 # Copyright 2022-2023 lox9973
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#	 http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 # SPDX-License-Identifier: Apache-2.0
 @tool
 extends Node
@@ -81,6 +68,16 @@ func apply_pose_to_humanoid_driver_coefficents() -> void:
 					if humanoid_bone_id >= 1:
 						var muscle_triplet_vector: Vector3 = humanoid_transform_util.inverse_calculate_humanoid_rotation(leftovers, humanoid_bone_id, custom_pose)
 						if target:
+							# Ensure target.bone_swing_twists and target.bone_leftovers are large enough
+							while len(target.bone_swing_twists) <= humanoid_bone_id:
+								target.bone_swing_twists.append(Vector3.ZERO)
+							# Ensure target.bone_leftovers is also sized appropriately
+							while len(target.bone_leftovers) <= humanoid_bone_id:
+								target.bone_leftovers.append(Quaternion.IDENTITY)
+
+							target.bone_swing_twists[humanoid_bone_id] = muscle_triplet_vector
+							if humanoid_bone_id < leftovers.size(): 
+								target.bone_leftovers[humanoid_bone_id] = leftovers[humanoid_bone_id]
 							var muscle_from_bone: Array = bone_and_axis_to_coefficent_mapping_table[humanoid_bone_id]
 							var muscle_triplet: Array[float] = [muscle_triplet_vector.x, muscle_triplet_vector.y, muscle_triplet_vector.z]
 							

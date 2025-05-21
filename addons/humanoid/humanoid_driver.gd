@@ -1,19 +1,6 @@
-# -!- coding: utf-8 -!-
-#
 # Copyright 2023-present Lyuma and contributors
 # Copyright 2022-2023 lox9973
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#	 http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 # SPDX-License-Identifier: Apache-2.0
 @tool
 extends Node
@@ -28,13 +15,17 @@ const humanoid_transform_util_const: Resource = preload("transform_util.gd")
 @export var skeleton: Skeleton3D = null
 @export var hips_transform: Transform3D = Transform3D()
 
-var muscle_settings: Array[float]
+@export var muscle_settings: Array[float] = []
+@export var bone_swing_twists: Array[Vector3] = []
+@export var bone_leftovers: Array[Quaternion] = []
 
 func _init():
 	muscle_settings.resize(human_trait_const.MuscleCount)
 	muscle_settings.fill(0.0)
+	bone_leftovers.resize(human_trait_const.BoneCount)
+	bone_leftovers.fill(Quaternion.IDENTITY)
 
-var bone_swing_twists: Array[Vector3] = []
+var humanoid_track_sets: Array[Array] = []
 
 func update_muscle_values() -> void:
 	var bone_name_to_index: Dictionary = human_trait_const.bone_name_to_index() # String -> int
@@ -65,7 +56,7 @@ func update_muscle_values() -> void:
 			new_vec.z = humanoid_track_sets[i][2]
 			
 		bone_swing_twists.append(new_vec)
-	
+
 func _process(_delta: float) -> void:
 	if skeleton:
 		if reset_pose:
@@ -102,7 +93,12 @@ func _process(_delta: float) -> void:
 					"""
 					
 					var value: Quaternion = humanoid_transform_util_const.calculate_humanoid_rotation(humanoid_bone_id, this_swing_twist)
-					skeleton.set_bone_pose_rotation(i, pre_value * value)
+					
+					var leftover_compensation: Quaternion = Quaternion.IDENTITY
+					if humanoid_bone_id < bone_leftovers.size(): 
+						leftover_compensation = bone_leftovers[humanoid_bone_id]
+					
+					skeleton.set_bone_pose_rotation(i, pre_value * value * leftover_compensation) 
 					
 		skeleton.set_bone_pose(0, hips_transform)
 					
