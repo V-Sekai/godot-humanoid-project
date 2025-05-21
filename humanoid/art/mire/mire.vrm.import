@@ -42,7 +42,7 @@ _subresources={
 "retarget/remove_tracks/unmapped_bones": 2,
 "retarget/rest_fixer/fix_silhouette/enable": true,
 "retarget/rest_fixer/fix_silhouette/threshold": 3.0,
-"retarget/rest_fixer/retarget_method": 2
+"retarget/rest_fixer/retarget_method": 0
 }
 }
 }
