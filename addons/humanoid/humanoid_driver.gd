@@ -62,46 +62,64 @@ func _process(_delta: float) -> void:
 		if reset_pose:
 			for i: int in range(0, skeleton.get_bone_count()):
 				skeleton.set_bone_pose(i, skeleton.get_bone_rest(i))
+			return # If resetting pose, do nothing else this frame
 	
 	if not active and Engine.is_editor_hint():
 		return
 	
 	if skeleton:
 		update_muscle_values()
+		
+		var target_root_bone_idx: int = -1
+		var target_hips_bone_idx: int = -1 # This is the bone *named* Hips or GodotHumanNames[0]
+
+		# Pass 1: Reset bones and find target Root and Hips
 		for i: int in range(0, skeleton.get_bone_count()):
-			skeleton.set_bone_pose(i, skeleton.get_bone_rest(i))
+			skeleton.set_bone_pose(i, skeleton.get_bone_rest(i)) # Reset to rest pose
+			var bone_name_check: String = skeleton.get_bone_name(i)
+			if bone_name_check == "Root" and target_root_bone_idx == -1:
+				target_root_bone_idx = i
+			# Check if this bone is mapped as Hips (humanoid_bone_id == 0)
+			if human_trait_const.GodotHumanNames.find(bone_name_check) == 0 and target_hips_bone_idx == -1:
+				target_hips_bone_idx = i
+		
+		var bone_to_receive_hips_transform: int = -1
+		if target_root_bone_idx != -1:
+			bone_to_receive_hips_transform = target_root_bone_idx
+		elif target_hips_bone_idx != -1:
+			bone_to_receive_hips_transform = target_hips_bone_idx
+		else:
+			var default_hips_name = human_trait_const.GodotHumanNames[0] if human_trait_const.GodotHumanNames.size() > 0 else "Hips"
+			push_warning("HumanoidDriver: Neither 'Root' nor mapped '%s' bone found in target skeleton. Root motion from source will not be applied." % default_hips_name)
+
+		# Pass 2: Apply muscle and leftover rotations to all mapped bones
+		# that are NOT receiving the full hips_transform.
+		for i: int in range(0, skeleton.get_bone_count()):
+			if i == bone_to_receive_hips_transform:
+				continue # This bone gets the full hips_transform later
+
 			var bone_name: String = skeleton.get_bone_name(i)
 			var humanoid_bone_id: int = human_trait_const.GodotHumanNames.find(bone_name)
+			
+			# Process if it's a mapped bone (humanoid_bone_id >= 0).
+			# This includes Hips (humanoid_bone_id == 0) if Hips is not the bone_to_receive_hips_transform.
 			if humanoid_bone_id >= 0:
-				if humanoid_bone_id == 0:
-					skeleton.set_bone_pose(i, Transform3D())
-				else:
-					var affected_by_bone_idx: int = human_trait_const.extraAffectedByBones.get(humanoid_bone_id, -1)
-					var weight = 1.0
-					var this_swing_twist: Vector3 = Vector3(bone_swing_twists[humanoid_bone_id])
-					#if humanoid_bone_id == 11:
-					#	print(this_swing_twist)
-					var pre_value: Quaternion = Quaternion()
-					
-					"""
-					if affected_by_bone_idx != -1:
-						weight = 0.5
-						this_swing_twist.x *= weight
-						var affected_by_twist: Vector3 = Vector3(bone_swing_twists[affected_by_bone_idx])
-						affected_by_twist = Vector3(affected_by_twist.x * (1.0 - weight), 0, 0)
-						pre_value = humanoid_transform_util_const.calculate_humanoid_rotation(affected_by_bone_idx, affected_by_twist, true)
-					"""
-					
+				if humanoid_bone_id < bone_swing_twists.size(): # Ensure index is valid
+					var this_swing_twist: Vector3 = bone_swing_twists[humanoid_bone_id]
+					var pre_value: Quaternion = Quaternion() 
 					var value: Quaternion = humanoid_transform_util_const.calculate_humanoid_rotation(humanoid_bone_id, this_swing_twist)
-					
 					var leftover_compensation: Quaternion = Quaternion.IDENTITY
 					if humanoid_bone_id < bone_leftovers.size(): 
 						leftover_compensation = bone_leftovers[humanoid_bone_id]
 					
-					skeleton.set_bone_pose_rotation(i, pre_value * value * leftover_compensation) 
-					
-		skeleton.set_bone_pose(0, hips_transform)
-					
+					skeleton.set_bone_pose_rotation(i, pre_value * value * leftover_compensation)
+				else:
+					push_warning("HumanoidDriver: humanoid_bone_id %d out of bounds for bone_swing_twists (size %d) for bone '%s'" % [humanoid_bone_id, bone_swing_twists.size(), bone_name])
+
+		# Pass 3: Apply the full hips_transform (root motion)
+		if bone_to_receive_hips_transform != -1:
+			skeleton.set_bone_pose(bone_to_receive_hips_transform, hips_transform)
+
 func _get_property_list() -> Array[Dictionary]:
 	var properties: Array[Dictionary] = []
 	for i: int in range(0, human_trait_const.MuscleCount):
