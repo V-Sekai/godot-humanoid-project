@@ -291,8 +291,8 @@ const preQ_exported: Array[Quaternion] = [
 	Quaternion(-0.400775, 0.505665, 0.148645, -0.749395), # RightUpperArm
 	Quaternion(-0.998935, 0.046125, 0.001085, 0.000045), # LeftLowerArm
 	Quaternion(-0.04613, 0.99894, 0.00005, 0.00108), # RightLowerArm
-	Quaternion(-0.707276, -0.02914, 0.705735, 0.029083), # LeftHand
-	Quaternion(0.705735, 0.029083, 0.707276, 0.02914), # RightHand
+	Quaternion(-0.02914, -0.029083, 0.707276, -0.705735), # LeftHand
+	Quaternion(0.029083, 0.02914, -0.705735, 0.707276), # RightHand
 	Quaternion(-0.500002, 0.500002, -0.500002, 0.500002), # LeftToes
 	Quaternion(-0.500002, 0.500002, -0.500002, 0.500002), # RightToes
 	Quaternion(0.70711, 0, -0.70711, 0), # LeftEye
