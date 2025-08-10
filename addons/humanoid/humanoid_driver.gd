@@ -28,12 +28,8 @@ func _init():
 var humanoid_track_sets: Array[Array] = []
 
 func update_muscle_values() -> void:
-	var bone_name_to_index: Dictionary = human_trait_const.bone_name_to_index() # String -> int
-	var muscle_name_to_index: Dictionary = human_trait_const.muscle_name_to_index() # String -> int
 	var muscle_index_to_bone_and_axis: Array[Vector2i] = human_trait_const.muscle_index_to_bone_and_axis() # int -> Vector2i
-	
-	var humanoid_track_sets: Array[Array] = []
-	
+		
 	for i: int in range(human_trait_const.BoneCount + 1):
 		if i == 0:
 			humanoid_track_sets.append([null, null, null, null])
@@ -69,28 +65,23 @@ func _process(_delta: float) -> void:
 	
 	if skeleton:
 		update_muscle_values()
-		
-		var target_root_bone_idx: int = -1
+
 		var target_hips_bone_idx: int = -1 # This is the bone *named* Hips or GodotHumanNames[0]
 
-		# Pass 1: Reset bones and find target Root and Hips
+		# Pass 1: Reset bones and find target Hips
 		for i: int in range(0, skeleton.get_bone_count()):
 			skeleton.set_bone_pose(i, skeleton.get_bone_rest(i)) # Reset to rest pose
 			var bone_name_check: String = skeleton.get_bone_name(i)
-			if bone_name_check == "Root" and target_root_bone_idx == -1:
-				target_root_bone_idx = i
 			# Check if this bone is mapped as Hips (humanoid_bone_id == 0)
 			if human_trait_const.GodotHumanNames.find(bone_name_check) == 0 and target_hips_bone_idx == -1:
 				target_hips_bone_idx = i
 		
 		var bone_to_receive_hips_transform: int = -1
-		if target_root_bone_idx != -1:
-			bone_to_receive_hips_transform = target_root_bone_idx
-		elif target_hips_bone_idx != -1:
+		if target_hips_bone_idx != -1:
 			bone_to_receive_hips_transform = target_hips_bone_idx
 		else:
 			var default_hips_name = human_trait_const.GodotHumanNames[0] if human_trait_const.GodotHumanNames.size() > 0 else "Hips"
-			push_warning("HumanoidDriver: Neither 'Root' nor mapped '%s' bone found in target skeleton. Root motion from source will not be applied." % default_hips_name)
+			push_warning("HumanoidDriver: Mapped '%s' bone not found in target skeleton." % default_hips_name)
 
 		# Pass 2: Apply muscle and leftover rotations to all mapped bones
 		# that are NOT receiving the full hips_transform.

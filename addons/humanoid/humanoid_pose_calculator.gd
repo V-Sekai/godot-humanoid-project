@@ -18,8 +18,6 @@ const humanoid_transform_util: Resource = preload("transform_util.gd")
 var bone_and_axis_to_coefficent_mapping_table: Array[Array] = []
 	
 func precalculate_bone_axis_table() -> void:
-	var bone_name_to_index: Dictionary = human_trait.bone_name_to_index() # String -> int
-	var muscle_name_to_index: Dictionary = human_trait.muscle_name_to_index() # String -> int
 	var muscle_index_to_bone_and_axis: Array[Vector2i] = human_trait.muscle_index_to_bone_and_axis() # int -> Vector2i
 		
 	bone_and_axis_to_coefficent_mapping_table = []
@@ -49,36 +47,21 @@ func apply_pose_to_humanoid_driver_coefficents() -> void:
 			var new_pose: Transform3D = Transform3D(rest_transform.basis.orthonormalized(), rest_transform.origin)
 			skeleton.set_bone_pose(bone_idx, new_pose)
 
-	var source_root_motion_bone_name: String = ""
+	var source_hips_bone_name: String = ""
 	var found_source_for_hips_transform: bool = false
 
-	# Pass 1: Determine which bone provides the root motion for target.hips_transform
-	# Prefer "Root", then fallback to mapped "Hips"
-	var root_bone_candidate_idx = -1
 	for bone_idx: int in range(0, skeleton.get_bone_count()):
 		var bone_name_check: String = skeleton.get_bone_name(bone_idx)
-		if bone_name_check == "Root":
-			root_bone_candidate_idx = bone_idx
-			break # Found preferred "Root"
-
-	if root_bone_candidate_idx != -1:
-		target.hips_transform = skeleton.get_bone_pose(root_bone_candidate_idx)
-		source_root_motion_bone_name = "Root"
-		found_source_for_hips_transform = true
-	else:
-		# "Root" not found, try to find mapped "Hips"
-		for bone_idx: int in range(0, skeleton.get_bone_count()):
-			var bone_name_check: String = skeleton.get_bone_name(bone_idx)
-			var humanoid_id_check: int = human_trait.GodotHumanNames.find(bone_name_check)
-			if humanoid_id_check == 0: # This is the mapped "Hips"
-				target.hips_transform = skeleton.get_bone_pose(bone_idx)
-				source_root_motion_bone_name = bone_name_check # Actual name of the Hips bone
-				found_source_for_hips_transform = true
-				break
+		var humanoid_id_check: int = human_trait.GodotHumanNames.find(bone_name_check)
+		if humanoid_id_check == human_trait.HumanBodyBones.Hips: # This is the mapped "Hips"
+			target.hips_transform = skeleton.get_bone_pose(bone_idx)
+			source_hips_bone_name = bone_name_check # Actual name of the Hips bone
+			found_source_for_hips_transform = true
+			break
 	
 	if not found_source_for_hips_transform:
 		target.hips_transform = Transform3D() # Default to identity if neither found
-		push_warning("HumanoidPoseCalculator: Neither 'Root' nor mapped 'Hips' bone found in source skeleton for root motion.")
+		push_warning("HumanoidPoseCalculator: 'Hips' bone found in source skeleton.")
 
 	# Initialize local leftovers array for inverse_calculate_humanoid_rotation
 	var local_leftovers_array: Array[Quaternion] = []
@@ -101,7 +84,7 @@ func apply_pose_to_humanoid_driver_coefficents() -> void:
 		var bone_name: String = skeleton.get_bone_name(bone_idx)
 		var humanoid_bone_id: int = human_trait.GodotHumanNames.find(bone_name)
 
-		if bone_name == source_root_motion_bone_name:
+		if bone_name == source_hips_bone_name:
 			# This bone's full local transform was used for target.hips_transform.
 			# Clear its potential muscle/leftover values in the target, as it's not driven by them.
 			if humanoid_bone_id >= 0: # If it happens to be a mapped bone (e.g. Hips was used)
