@@ -65,7 +65,7 @@ func _process(_delta: float) -> void:
 	
 	if skeleton:
 		update_muscle_values()
-
+		
 		var target_hips_bone_idx: int = -1 # This is the bone *named* Hips or GodotHumanNames[0]
 
 		# Pass 1: Reset bones and find target Hips
